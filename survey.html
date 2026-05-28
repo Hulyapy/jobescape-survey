@@ -710,6 +710,7 @@
           100% private
         </span>
       </div>
+      <div id="email-prefill-badge" style="display:none;font-size:12.5px;font-weight:500;color:var(--accent);background:var(--accent-light);border:1px solid var(--accent-mid);border-radius:20px;padding:5px 14px;margin-bottom:16px"></div>
       <div class="intro-cta">
         <button class="btn btn-primary" onclick="startSurvey()">
           Start — 90 seconds
@@ -983,25 +984,19 @@
   let userEmail = '';
   let current = 'intro';
 
-  // ── CUSTOMER.IO EMAIL FETCH (non-blocking) ──────
-  function fetchEmailFromCDP() {
-    const apiKey = '3f46f8cd6239ea73235b';
-    fetch('https://cdp.customer.io/v1/identify', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' + btoa(apiKey + ':'),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({})
-    })
-    .then(r => r.ok ? r.json() : null)
-    .then(data => {
-      if (!data) return;
-      userEmail = data.email
-        || (data.traits && data.traits.email)
-        || '';
-    })
-    .catch(() => {});
+  // ── EMAIL FROM URL PARAM ───────────────────────
+  // In Customer.io, set your survey link as:
+  //   https://contenttask.vercel.app/survey.html?email={{ customer.email }}
+  function readEmailFromURL() {
+    const raw = new URLSearchParams(window.location.search).get('email') || '';
+    userEmail = raw.trim().toLowerCase();
+    if (userEmail) {
+      const badge = document.getElementById('email-prefill-badge');
+      if (badge) {
+        badge.textContent = '✓ Sending as ' + userEmail;
+        badge.style.display = 'inline-block';
+      }
+    }
   }
 
   // ── BUILD OPTION LISTS ─────────────────────────
@@ -1171,9 +1166,9 @@
 
   // ── INIT ───────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
+    readEmailFromURL();
     trackEvent('page_viewed');
     trackEvent('intro_seen');
-    fetchEmailFromCDP();
     [1, 2, 3, 4, 5].forEach(buildOpts);
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeGiftModal();
