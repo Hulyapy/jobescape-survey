@@ -992,7 +992,7 @@
     const params = new URLSearchParams(window.location.search);
     const raw = params.get('email') || '';
     userEmail = raw.trim().toLowerCase();
-    userCid = (params.get('cid') || '').trim();
+    userCid = (params.get('id') || '').trim();
     if (userEmail) {
       const badge = document.getElementById('email-prefill-badge');
       if (badge) {
