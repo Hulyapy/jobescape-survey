@@ -739,6 +739,7 @@
                 <th onclick="sortBy('idx')">#<span class="sort-icon">↕</span></th>
                 <th onclick="sortBy('created_at')" class="sorted">Date<span class="sort-icon">↓</span></th>
                 <th onclick="sortBy('email')">Email<span class="sort-icon">↕</span></th>
+                <th onclick="sortBy('cio_id')">Cio ID<span class="sort-icon">↕</span></th>
                 <th onclick="sortBy('field')">Field (Q1)<span class="sort-icon">↕</span></th>
                 <th onclick="sortBy('goal')">Goal (Q2)<span class="sort-icon">↕</span></th>
                 <th onclick="sortBy('time_drain')">Time drain (Q3)<span class="sort-icon">↕</span></th>
@@ -999,7 +1000,7 @@
 
     if (query) {
       rows = rows.filter(r =>
-        ['email', 'field', 'goal', 'time_drain', 'success', 'expectation', 'suggestions'].some(k =>
+        ['email', 'cio_id', 'field', 'goal', 'time_drain', 'success', 'expectation', 'suggestions'].some(k =>
           (r[k] || '').toLowerCase().includes(query)
         )
       );
@@ -1020,7 +1021,7 @@
         : `${rows.length} of ${allData.length} shown`;
 
     if (!rows.length) {
-      tbody.innerHTML = `<tr><td colspan="9" class="no-results">No results found</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" class="no-results">No results found</td></tr>`;
       return;
     }
 
@@ -1029,6 +1030,7 @@
         <td>${r.idx}</td>
         <td class="td-date">${formatDate(r.created_at)}</td>
         <td>${esc(r.email)}</td>
+        <td>${r.cio_id ? `<a href="https://fly.customer.io/env/0/people/${r.cio_id}" target="_blank" rel="noopener" style="color:var(--accent);font-family:monospace;font-size:11.5px">${r.cio_id}</a>` : '<span style="color:var(--text-light)">—</span>'}</td>
         <td>${esc(r.field)}</td>
         <td>${esc(r.goal)}</td>
         <td>${esc(r.time_drain)}</td>
@@ -1047,7 +1049,7 @@
     }
 
     document.querySelectorAll('thead th').forEach((th, i) => {
-      const cols = ['idx','created_at','email','field','goal','time_drain','success','expectation','suggestions'];
+      const cols = ['idx','created_at','email','cio_id','field','goal','time_drain','success','expectation','suggestions'];
       const isSorted = cols[i] === sortCol;
       th.classList.toggle('sorted', isSorted);
       const icon = th.querySelector('.sort-icon');
@@ -1059,7 +1061,7 @@
 
   // ── CSV EXPORT ───────────────────────────────────
   function exportCSV() {
-    const headers = ['id','created_at','email','field','goal','time_drain','success','expectation','suggestions'];
+    const headers = ['id','created_at','email','cio_id','field','goal','time_drain','success','expectation','suggestions'];
     const rows = [headers.join(',')];
     allData.forEach(r => {
       rows.push(headers.map(h => `"${(r[h] || '').replace(/"/g, '""')}"`).join(','));

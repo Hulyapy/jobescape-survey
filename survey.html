@@ -982,14 +982,17 @@
   // ── STATE ──────────────────────────────────────
   const answers = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: '' };
   let userEmail = '';
+  let userCid = '';
   let current = 'intro';
 
-  // ── EMAIL FROM URL PARAM ───────────────────────
+  // ── EMAIL + CID FROM URL PARAMS ────────────────
   // In Customer.io, set your survey link as:
-  //   https://contenttask.vercel.app/survey.html?email={{ customer.email }}
+  //   https://contenttask.vercel.app/survey.html?email={{ customer.email }}&cid={{ customer.id }}
   function readEmailFromURL() {
-    const raw = new URLSearchParams(window.location.search).get('email') || '';
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('email') || '';
     userEmail = raw.trim().toLowerCase();
+    userCid = (params.get('cid') || '').trim();
     if (userEmail) {
       const badge = document.getElementById('email-prefill-badge');
       if (badge) {
@@ -1103,6 +1106,7 @@
         },
         body: JSON.stringify({
           email:       userEmail,
+          cio_id:      userCid,
           field:       answers[1],
           goal:        answers[2],
           time_drain:  answers[3],
