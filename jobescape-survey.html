@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jobescape — Course Survey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:        #2563EB;
+      --accent-dark:   #1D4ED8;
+      --accent-light:  #EFF6FF;
+      --accent-mid:    #BFDBFE;
+      --text-dark:     #1A2740;
+      --text-mid:      #4B5E7A;
+      --text-light:    #9BACC2;
+      --card-bg:       rgba(255,255,255,0.72);
+      --card-border:   rgba(255,255,255,0.88);
+      --r:             16px;
+      --r-sm:          11px;
+      --shadow:        0 4px 28px rgba(37,99,235,0.09), 0 1px 4px rgba(0,0,0,0.05);
+      --shadow-lg:     0 12px 44px rgba(37,99,235,0.11), 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-dark);
+      min-height: 100vh;
+      background: linear-gradient(145deg, #EAF0FB 0%, #F4F7FD 45%, #EDF2FB 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Grid texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 32px;
+      background: rgba(255,255,255,0.76);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-bottom: 1px solid rgba(255,255,255,0.82);
+      box-shadow: 0 1px 14px rgba(37,99,235,0.07);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      height: 30px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-logo svg,
+    .nav-logo .logo-svg {
+      height: 30px;
+      width: auto;
+      display: block;
+    }
+    .nav-logo-fallback {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--accent-mid);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── PROGRESS ────────────────────────────── */
+    #progress-wrap {
+      position: sticky;
+      top: 56px;
+      z-index: 190;
+      padding: 11px 32px 12px;
+      background: rgba(240,245,253,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(37,99,235,0.07);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    #progress-wrap.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-4px);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+
+    #progress-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    #progress-pct {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+
+    .progress-track {
+      height: 4px;
+      background: var(--accent-mid);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, #60A5FA 100%);
+      width: 0%;
+      transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── MAIN ────────────────────────────────── */
+    .main {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 44px 20px 72px;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── SCREENS ─────────────────────────────── */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 648px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .screen.leaving {
+      display: flex;
+      animation: fadeGone 0.22s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeGone {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 0; transform: translateY(-10px) scale(0.985); }
+    }
+
+    /* ── CARD ────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-lg);
+      padding: 40px 44px;
+    }
+
+    /* ── INTRO ───────────────────────────────── */
+    .intro-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .intro-logo-wrap img {
+      height: 50px;
+      width: auto;
+    }
+
+    .intro-logo-wrap .logo-svg {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+    .intro-logo-wrap .logo-text-fallback {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px;
+      color: var(--text-dark);
+      letter-spacing: -0.03em;
+    }
+
+    .intro-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      line-height: 1.14;
+      color: var(--text-dark);
+      text-align: center;
+      letter-spacing: -0.025em;
+      margin-bottom: 16px;
+    }
+
+    .intro-body {
+      font-size: 15.5px;
+      line-height: 1.68;
+      color: var(--text-mid);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .intro-body strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-mid);
+    }
+
+    .meta-chip svg { color: var(--accent); flex-shrink: 0; }
+
+    .intro-cta { display: flex; justify-content: center; }
+
+    /* ── BUTTONS ─────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 50px;
+      transition: all 0.18s;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 13px 30px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.34);
+    }
+
+    .btn-primary:hover { background: var(--accent-dark); box-shadow: 0 6px 22px rgba(37,99,235,0.44); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      background: #CBD5E1;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+      color: #94A3B8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mid);
+      padding: 11px 22px;
+      border: 1.5px solid rgba(37,99,235,0.18);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+    }
+
+    .btn-row.solo { justify-content: flex-end; }
+
+    /* ── QUESTION ────────────────────────────── */
+    .q-step {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .q-step::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-mid), transparent);
+      border-radius: 1px;
+    }
+
+    .q-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 25px;
+      line-height: 1.26;
+      color: var(--text-dark);
+      letter-spacing: -0.015em;
+      margin-bottom: 26px;
+    }
+
+    /* ── OPTIONS LIST ────────────────────────── */
+    .opt-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .opt {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.62);
+      border: 2px solid rgba(37,99,235,0.1);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      transition: all 0.16s;
+      user-select: none;
+      position: relative;
+    }
+
+    .opt:hover {
+      background: rgba(239,246,255,0.82);
+      border-color: rgba(37,99,235,0.28);
+      transform: translateX(2px);
+    }
+
+    .opt.selected {
+      background: rgba(239,246,255,0.92);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .opt-emoji {
+      font-size: 19px;
+      width: 26px;
+      text-align: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .opt-label {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--text-dark);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .opt-check {
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      border: 2px solid rgba(37,99,235,0.22);
+      background: white;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.16s;
+    }
+
+    .opt.selected .opt-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .opt-check svg {
+      width: 11px;
+      height: 11px;
+      stroke: white;
+      stroke-width: 2.8;
+      fill: none;
+      opacity: 0;
+      transform: scale(0.4);
+      transition: opacity 0.16s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .opt.selected .opt-check svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ── THANK YOU ───────────────────────────── */
+    .ty-icon {
+      width: 66px;
+      height: 66px;
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 24px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.14);
+    }
+
+    .ty-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px;
+      letter-spacing: -0.025em;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .ty-sub {
+      font-size: 15px;
+      color: var(--text-mid);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 34px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .sum-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(37,99,235,0.1);
+      border-radius: var(--r-sm);
+      padding: 18px 20px;
+      animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .sum-card:nth-child(5) { grid-column: 1 / -1; }
+
+    .sum-q {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 7px;
+    }
+
+    .sum-a {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-dark);
+      line-height: 1.45;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 22px 20px;
+      font-size: 12px;
+      color: var(--text-light);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 580px) {
+      nav { padding: 12px 18px; }
+      #progress-wrap { padding: 10px 18px 11px; }
+      .card { padding: 28px 22px; }
+      .intro-heading { font-size: 28px; }
+      .q-title { font-size: 21px; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .sum-card:nth-child(5) { grid-column: auto; }
+      .meta-row { gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────── -->
+<nav>
+  <a href="https://jobescape.me" class="nav-logo">
+    <img src="logo.svg" alt="Jobescape"
+         style="display:none;height:30px"
+         onload="this.style.display='block';this.nextElementSibling.style.display='none'"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+    <span class="nav-logo-fallback">Jobescape</span>
+  </a>
+  <span class="nav-badge">Course Survey</span>
+</nav>
+
+<!-- ── PROGRESS ──────────────────────────────── -->
+<div id="progress-wrap" class="hidden">
+  <div class="progress-meta">
+    <span id="progress-label">Question 1 of 5</span>
+    <span id="progress-pct">20%</span>
+  </div>
+  <div class="progress-track">
+    <div id="progress-fill"></div>
+  </div>
+</div>
+
+<!-- ── MAIN ──────────────────────────────────── -->
+<main class="main">
+
+  <!-- INTRO -->
+  <div class="screen active" id="screen-intro">
+    <div class="card" style="text-align:center">
+      <div class="intro-logo-wrap">
+        <img src="logo.svg" alt="Jobescape"
+             style="height:52px;display:none"
+             onload="this.style.display='block';this.nextElementSibling.style.display='none'"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <span class="logo-text-fallback">Jobescape</span>
+      </div>
+      <h1 class="intro-heading">There's no wrong answer here.</h1>
+      <p class="intro-body">
+        You took the time to learn. Now help us make it worth it for the next person.
+        We're rebuilding <strong>Master the Claude</strong> from scratch, and your experience is
+        exactly what we need.<br><br>
+        <em style="font-style:italic;color:var(--text-dark)">2 minutes, 5 questions.</em>
+      </p>
+      <div class="meta-row">
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          2 minutes
+        </span>
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          5 questions
+        </span>
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          100% private
+        </span>
+      </div>
+      <div class="intro-cta">
+        <button class="btn btn-primary" onclick="startSurvey()">
+          Start survey
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="screen" id="screen-q1">
+    <div class="card">
+      <div class="q-step">Question 1 of 5</div>
+      <h2 class="q-title">Which field best describes your work?</h2>
+      <div class="opt-list" id="q1-opts"></div>
+      <div class="btn-row solo">
+        <button class="btn btn-primary" id="q1-next" disabled onclick="goNext(1)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="screen" id="screen-q2">
+    <div class="card">
+      <div class="q-step">Question 2 of 5</div>
+      <h2 class="q-title">What's your main goal with Claude?</h2>
+      <div class="opt-list" id="q2-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(2)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q2-next" disabled onclick="goNext(2)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="screen" id="screen-q3">
+    <div class="card">
+      <div class="q-step">Question 3 of 5</div>
+      <h2 class="q-title">What do you spend the most time on at work?</h2>
+      <div class="opt-list" id="q3-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(3)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q3-next" disabled onclick="goNext(3)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="screen" id="screen-q4">
+    <div class="card">
+      <div class="q-step">Question 4 of 5</div>
+      <h2 class="q-title">What would make this plan a success?</h2>
+      <div class="opt-list" id="q4-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(4)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q4-next" disabled onclick="goNext(4)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="screen" id="screen-q5">
+    <div class="card">
+      <div class="q-step">Question 5 of 5</div>
+      <h2 class="q-title">What do you expect to get from Jobescape?</h2>
+      <div class="opt-list" id="q5-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(5)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q5-next" disabled onclick="submitSurvey()">
+          Submit &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="screen" id="screen-thanks">
+    <div class="card">
+      <div class="ty-icon">🎉</div>
+      <h2 class="ty-heading">Thank you!</h2>
+      <p class="ty-sub">
+        Your answers will help us build a better course.<br>
+        Here's what you shared:
+      </p>
+      <div class="summary-grid" id="summary-grid"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────── -->
+<footer>jobescape.me &nbsp;·&nbsp; Your answers are private and used only to improve the course.</footer>
+
+<script>
+  // ── DATA ──────────────────────────────────────
+  const Q = {
+    1: {
+      short: 'Your field',
+      opts: [
+        ['💰', 'Finance / accounting / banking'],
+        ['⚖️', 'Legal / compliance'],
+        ['📣', 'Marketing / sales / growth'],
+        ['💻', 'Software / engineering / IT'],
+        ['📋', 'Operations / project management / consulting'],
+        ['🎨', 'Design / content / creative'],
+        ['🩺', 'Healthcare / pharma / biotech'],
+        ['🎓', 'Education / research'],
+        ['🛒', 'Retail / e-commerce / hospitality'],
+        ['🏗️', 'Real estate / construction / manufacturing'],
+        ['🏛️', 'Government / non-profit'],
+        ['••', 'None of these'],
+      ]
+    },
+    2: {
+      short: 'Main goal',
+      opts: [
+        ['⚡', 'Save time — do the same job faster'],
+        ['🏆', 'Better outputs — higher quality, fewer mistakes'],
+        ['📈', 'Get promoted or change roles — build AI skills'],
+        ['💸', 'Earn extra income — freelance or side projects'],
+        ['🚀', 'Build something — a product, app, or business'],
+        ['💡', 'Just learn — curious about what\'s possible'],
+        ['👥', 'Help my team or company adopt AI'],
+      ]
+    },
+    3: {
+      short: 'Most time on',
+      opts: [
+        ['✉️', 'Writing emails and messages'],
+        ['📄', 'Writing documents, reports, proposals'],
+        ['📊', 'Analyzing data, spreadsheets, financial work'],
+        ['🖥️', 'Making presentations and pitch decks'],
+        ['🔍', 'Research — finding and summarizing information'],
+        ['💼', 'Client work — proposals, contracts, deliverables'],
+        ['⌨️', 'Coding and technical work'],
+        ['📅', 'Planning, scheduling, project management'],
+        ['🎙️', 'Meetings, calls, follow-ups'],
+        ['✨', 'Creative work — content, design, marketing'],
+        ['🔄', 'Repetitive admin — data entry, status updates'],
+        ['••', 'Nothing specific — just want to use AI better'],
+      ]
+    },
+    4: {
+      short: 'Success looks like',
+      opts: [
+        ['✅', 'I shipped something real I actually used at work'],
+        ['🧠', 'I understand Claude deeply and know when to use it'],
+        ['⚡', 'I\'m noticeably faster — measurable time savings'],
+        ['💰', 'I made money — promotion, client, or extra income'],
+        ['🛠️', 'I built something — an app, automation, or product'],
+        ['🎖️', 'I have credentials — certificates or portfolio pieces'],
+        ['👥', 'I helped my team or company adopt Claude'],
+      ]
+    },
+    5: {
+      short: 'Expected from Jobescape',
+      opts: [
+        ['📚', 'Learn the fundamentals — understand Claude well'],
+        ['📋', 'Ready-to-use prompts I can copy and adapt'],
+        ['🔀', 'Ready-to-use workflows for tasks I do every week'],
+        ['🔌', 'Claude Skills I can install and run on demand'],
+        ['💻', 'Real tools I build during the plan and keep using'],
+        ['📐', 'Templates and frameworks for documents and emails'],
+        ['🔨', 'Hands-on practice with real-world examples'],
+        ['🗺️', 'A clear structured learning path'],
+        ['🪪', 'Career-focused skills for my resume or interviews'],
+        ['🎯', 'Help applying Claude to my specific field'],
+        ['💬', 'Community or mentor support'],
+        ['••', 'Something else'],
+      ]
+    }
+  };
+
+  // ── STATE ─────────────────────────────────────
+  const answers = { 1: null, 2: null, 3: null, 4: null, 5: null };
+  let current = 'intro';
+
+  // ── BUILD OPTIONS ─────────────────────────────
+  function buildOpts(n) {
+    const container = document.getElementById(`q${n}-opts`);
+    if (!container || container.children.length) return;
+    Q[n].opts.forEach(([emoji, text], i) => {
+      const el = document.createElement('div');
+      el.className = 'opt';
+      el.innerHTML = `
+        <span class="opt-emoji" aria-hidden="true">${emoji}</span>
+        <span class="opt-label">${text}</span>
+        <span class="opt-check">
+          <svg viewBox="0 0 12 12"><polyline points="1.5 6 4.5 9.5 10.5 2.5"/></svg>
+        </span>`;
+      el.addEventListener('click', () => pick(n, i, text));
+      if (answers[n] === text) el.classList.add('selected');
+      container.appendChild(el);
+    });
+    if (answers[n]) document.getElementById(`q${n}-next`).disabled = false;
+  }
+
+  function pick(n, idx, text) {
+    answers[n] = text;
+    const els = document.querySelectorAll(`#q${n}-opts .opt`);
+    els.forEach((el, i) => el.classList.toggle('selected', i === idx));
+    document.getElementById(`q${n}-next`).disabled = false;
+  }
+
+  // ── PROGRESS ──────────────────────────────────
+  function setProgress(n) {
+    const wrap = document.getElementById('progress-wrap');
+    if (!n) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    const pct = Math.round((n / 5) * 100);
+    document.getElementById('progress-label').textContent = `Question ${n} of 5`;
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  // ── TRANSITIONS ───────────────────────────────
+  function show(id) {
+    const el = document.getElementById(`screen-${id}`);
+
+    // restore option selections
+    const m = id.match(/^q(\d)$/);
+    if (m) buildOpts(+m[1]);
+
+    // update progress
+    setProgress(m ? +m[1] : null);
+
+    el.classList.add('active');
+    current = id;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function go(fromId, toId) {
+    const from = document.getElementById(`screen-${fromId}`);
+    from.classList.remove('active');
+    from.classList.add('leaving');
+    setTimeout(() => {
+      from.classList.remove('leaving');
+      show(toId);
+    }, 200);
+  }
+
+  // ── NAVIGATION ────────────────────────────────
+  function startSurvey()  { go('intro', 'q1'); }
+  function goNext(n)      { go(`q${n}`, n < 5 ? `q${n + 1}` : 'thanks'); }
+  function goBack(n)      { go(`q${n}`, n > 1 ? `q${n - 1}` : 'intro'); }
+
+  function submitSurvey() {
+    buildSummary();
+    go('q5', 'thanks');
+    setProgress(null);
+  }
+
+  // ── SUMMARY ───────────────────────────────────
+  function buildSummary() {
+    const grid = document.getElementById('summary-grid');
+    grid.innerHTML = '';
+    const items = [
+      { q: 'Your field',              a: answers[1] },
+      { q: 'Main goal',               a: answers[2] },
+      { q: 'Most time on',            a: answers[3] },
+      { q: 'Success looks like',      a: answers[4] },
+      { q: 'Expected from Jobescape', a: answers[5] },
+    ];
+    items.forEach(({ q, a }, i) => {
+      const c = document.createElement('div');
+      c.className = 'sum-card';
+      c.style.animationDelay = `${(i + 1) * 0.07}s`;
+      c.innerHTML = `<div class="sum-q">${q}</div><div class="sum-a">${a || '—'}</div>`;
+      grid.appendChild(c);
+    });
+  }
+
+  // ── INIT ──────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    [1, 2, 3, 4, 5].forEach(buildOpts);
+
+    // Remove nav logo link on first click to prevent navigation to the SVG site
+    const navLogo = document.querySelector('.nav-logo');
+    if (navLogo) {
+      navLogo.addEventListener('click', function (e) {
+        if (this.getAttribute('href')) {
+          e.preventDefault();
+          this.removeAttribute('href');
+          this.style.cursor = 'default';
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

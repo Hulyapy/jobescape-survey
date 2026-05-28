@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+╔══════════════════════════════════════════════════════════════╗
+║  survey.html — Jobescape "Master the Claude" Survey          ║
+╠══════════════════════════════════════════════════════════════╣
+║  SETUP — paste your credentials in the <script> block below  ║
+║                                                              ║
+║  const SUPABASE_URL = 'https://supabase.com/dashboard/project/bzslzhddzmaqkryyypqi'            ║
+║  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6c2x6aGRkem1hcWtyeXl5cHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDA1NTAsImV4cCI6MjA5NTUxNjU1MH0.T15wblcjr32hHHObMVZHnjkU1_-i4J1MwvbHZ0meEsw'   ← anon public key          ║
+║                                                              ║
+║  Where to find them:                                         ║
+║  supabase.com → your project → Settings → API               ║
+║    • Project URL  → SUPABASE_URL                            ║
+║    • anon public  → SUPABASE_KEY                            ║
+╚══════════════════════════════════════════════════════════════╝
+-->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jobescape — Course Survey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.3/dist/lottie-player.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:       #2563EB;
+      --accent-dark:  #1D4ED8;
+      --accent-light: #EFF6FF;
+      --accent-mid:   #BFDBFE;
+      --text-dark:    #1A2740;
+      --text-mid:     #4B5E7A;
+      --text-light:   #9BACC2;
+      --card-bg:      rgba(255,255,255,0.72);
+      --card-border:  rgba(255,255,255,0.88);
+      --r:            16px;
+      --r-sm:         11px;
+      --shadow:       0 4px 28px rgba(37,99,235,0.09), 0 1px 4px rgba(0,0,0,0.05);
+      --shadow-lg:    0 12px 44px rgba(37,99,235,0.11), 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-dark);
+      min-height: 100vh;
+      background: linear-gradient(145deg, #EAF0FB 0%, #F4F7FD 45%, #EDF2FB 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 32px;
+      background: rgba(255,255,255,0.76);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-bottom: 1px solid rgba(255,255,255,0.82);
+      box-shadow: 0 1px 14px rgba(37,99,235,0.07);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      cursor: default;
+    }
+
+    .nav-logo img { height: 30px; width: auto; display: block; }
+    .nav-logo svg { height: 30px; width: auto; display: block; }
+    .nav-logo-fallback {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--accent-mid);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── PROGRESS ─────────────────────────────────── */
+    #progress-wrap {
+      position: sticky;
+      top: 56px;
+      z-index: 190;
+      padding: 11px 32px 12px;
+      background: rgba(240,245,253,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(37,99,235,0.07);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    #progress-wrap.hidden { opacity: 0; pointer-events: none; transform: translateY(-4px); }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+
+    #progress-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    #progress-pct { font-size: 11px; font-weight: 600; color: var(--text-mid); }
+
+    .progress-track { height: 4px; background: var(--accent-mid); border-radius: 2px; overflow: hidden; }
+
+    #progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, #60A5FA 100%);
+      width: 0%;
+      transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── MAIN ─────────────────────────────────────── */
+    .main {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 44px 20px 72px;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── SCREENS ──────────────────────────────────── */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 648px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .screen.leaving {
+      display: flex;
+      animation: fadeGone 0.22s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeGone {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 0; transform: translateY(-10px) scale(0.985); }
+    }
+
+    /* ── CARD ─────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-lg);
+      padding: 40px 44px;
+    }
+
+    /* ── INTRO ────────────────────────────────────── */
+    .intro-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .intro-logo-wrap img { height: 52px; width: auto; }
+    .intro-logo-wrap svg { height: 52px; width: auto; display: block; }
+    .intro-logo-fallback {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px;
+      color: var(--text-dark);
+      letter-spacing: -0.03em;
+    }
+
+    .intro-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      line-height: 1.14;
+      color: var(--text-dark);
+      text-align: center;
+      letter-spacing: -0.025em;
+      margin-bottom: 16px;
+    }
+
+    .intro-body {
+      font-size: 15.5px;
+      line-height: 1.68;
+      color: var(--text-mid);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .intro-body strong { color: var(--text-dark); font-weight: 600; }
+
+    .meta-row {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-mid);
+    }
+
+    .meta-chip svg { color: var(--accent); flex-shrink: 0; }
+    .intro-cta { display: flex; justify-content: center; }
+
+    .intro-badge {
+      display: inline-block;
+      font-size: 11.5px; font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1px solid var(--accent-mid);
+      border-radius: 20px;
+      padding: 5px 14px;
+      margin-bottom: 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .q-sub {
+      font-size: 13px; color: var(--text-light);
+      margin-bottom: 18px; line-height: 1.55;
+    }
+
+    .free-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14.5px; color: var(--text-dark);
+      background: rgba(255,255,255,0.9);
+      border: 2px solid rgba(37,99,235,0.15);
+      border-radius: var(--r-sm);
+      outline: none; resize: vertical;
+      min-height: 130px; line-height: 1.6;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      caret-color: var(--accent);
+    }
+
+    .free-textarea::placeholder { color: var(--text-light); }
+
+    .free-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      background: #fff;
+    }
+
+
+    /* ── GIFT BUTTON ──────────────────────────────── */
+    .btn-gift {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 600;
+      color: var(--accent);
+      background: transparent;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 12px 28px;
+      cursor: pointer;
+      animation: giftPulse 2s ease infinite;
+      transition: background 0.18s, color 0.18s;
+      margin-top: 28px;
+    }
+
+    .btn-gift:hover {
+      background: var(--accent-light);
+      animation: none;
+    }
+
+    @keyframes giftPulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.04); }
+    }
+
+    /* ── GIFT MODAL ───────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 480px; width: 100%;
+      position: relative;
+      text-align: center;
+      animation: modalIn 0.3s ease both;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 18px;
+      font-size: 20px; color: var(--text-light);
+      cursor: pointer; line-height: 1;
+      background: none; border: none;
+      padding: 4px 8px;
+      transition: color 0.15s;
+    }
+
+    .modal-close:hover { color: var(--text-dark); }
+
+    .modal-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: var(--text-dark);
+      letter-spacing: -0.02em;
+      line-height: 1.3; margin-bottom: 10px;
+    }
+
+    .modal-sub {
+      font-size: 14px; color: var(--text-mid);
+      line-height: 1.65; margin-bottom: 24px;
+    }
+
+    /* ── BUTTONS ──────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 50px;
+      transition: all 0.18s;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 13px 30px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.34);
+    }
+
+    .btn-primary:hover { background: var(--accent-dark); box-shadow: 0 6px 22px rgba(37,99,235,0.44); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      background: #CBD5E1;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+      color: #94A3B8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mid);
+      padding: 11px 22px;
+      border: 1.5px solid rgba(37,99,235,0.18);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+    }
+
+    .btn-row.solo { justify-content: flex-end; }
+
+    /* ── QUESTION ─────────────────────────────────── */
+    .q-step {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .q-step::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-mid), transparent);
+      border-radius: 1px;
+    }
+
+    .q-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 25px;
+      line-height: 1.26;
+      color: var(--text-dark);
+      letter-spacing: -0.015em;
+      margin-bottom: 26px;
+    }
+
+    /* ── FREE TEXT INPUT (Q1) ─────────────────────── */
+    .field-input {
+      width: 100%;
+      padding: 15px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15.5px;
+      color: var(--text-dark);
+      background: rgba(255,255,255,0.9);
+      border: 2px solid rgba(37,99,235,0.15);
+      border-radius: var(--r-sm);
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      margin-bottom: 10px;
+      caret-color: var(--accent);
+    }
+
+    .field-input::placeholder { color: var(--text-light); }
+
+    .field-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      background: #fff;
+    }
+
+    .field-helper {
+      font-size: 12.5px;
+      color: var(--text-light);
+      margin-bottom: 4px;
+      padding-left: 2px;
+    }
+
+    /* ── OPTIONS LIST ─────────────────────────────── */
+    .opt-list { display: flex; flex-direction: column; gap: 7px; }
+
+    .opt {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.62);
+      border: 2px solid rgba(37,99,235,0.1);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      transition: all 0.16s;
+      user-select: none;
+    }
+
+    .opt:hover { background: rgba(239,246,255,0.82); border-color: rgba(37,99,235,0.28); transform: translateX(2px); }
+    .opt.selected { background: rgba(239,246,255,0.92); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+    .opt-emoji { font-size: 19px; width: 26px; text-align: center; flex-shrink: 0; line-height: 1; }
+    .opt-label { font-size: 14.5px; font-weight: 500; color: var(--text-dark); flex: 1; line-height: 1.4; }
+
+    .opt-check {
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      border: 2px solid rgba(37,99,235,0.22);
+      background: white;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.16s;
+    }
+
+    .opt.selected .opt-check { background: var(--accent); border-color: var(--accent); }
+
+    .opt-check svg {
+      width: 11px; height: 11px;
+      stroke: white; stroke-width: 2.8; fill: none;
+      opacity: 0; transform: scale(0.4);
+      transition: opacity 0.16s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .opt.selected .opt-check svg { opacity: 1; transform: scale(1); }
+
+    /* ── SPINNER ──────────────────────────────────── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,0.38);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR MESSAGE ────────────────────────────── */
+    .submit-error {
+      display: none;
+      margin-top: 14px;
+      padding: 13px 16px;
+      background: #FEF2F2;
+      border: 1.5px solid #FCA5A5;
+      border-radius: var(--r-sm);
+      font-size: 13.5px;
+      color: #DC2626;
+      line-height: 1.5;
+    }
+
+    /* ── THANK YOU ────────────────────────────────── */
+    .ty-icon {
+      width: 66px; height: 66px;
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 24px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.14);
+    }
+
+    .ty-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      letter-spacing: -0.025em;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .ty-sub {
+      font-size: 15px;
+      color: var(--text-mid);
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 34px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .sum-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(37,99,235,0.1);
+      border-radius: var(--r-sm);
+      padding: 18px 20px;
+      animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .sum-card:nth-child(5) { grid-column: 1 / -1; }
+
+    .sum-q {
+      font-size: 10.5px; font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 7px;
+    }
+
+    .sum-a { font-size: 13.5px; font-weight: 500; color: var(--text-dark); line-height: 1.45; }
+
+    /* ── FOOTER ───────────────────────────────────── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 22px 20px;
+      font-size: 12px; color: var(--text-light);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 580px) {
+      nav { padding: 12px 18px; }
+      #progress-wrap { padding: 10px 18px 11px; }
+      .card { padding: 28px 22px; }
+      .intro-heading { font-size: 27px; }
+      .q-title { font-size: 21px; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .sum-card:nth-child(5) { grid-column: auto; }
+      .meta-row { gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ────────────────────────────────────────── -->
+<nav>
+  <span class="nav-logo">
+    <img src="logo.svg" alt="Jobescape">
+  </span>
+  <span class="nav-badge">Course Survey</span>
+</nav>
+
+<!-- ── PROGRESS ───────────────────────────────────── -->
+<div id="progress-wrap" class="hidden">
+  <div class="progress-meta">
+    <span id="progress-label">Question 1 of 6</span>
+    <span id="progress-pct">20%</span>
+  </div>
+  <div class="progress-track">
+    <div id="progress-fill"></div>
+  </div>
+</div>
+
+<!-- ── MAIN ───────────────────────────────────────── -->
+<main class="main">
+
+  <!-- INTRO SCREEN -->
+  <div class="screen active" id="screen-intro">
+    <div class="card" style="text-align:center">
+      <div class="intro-logo-wrap">
+        <img src="logo.svg" alt="Jobescape">
+      </div>
+      <div class="intro-badge">Master the Claude — Course feedback</div>
+      <h1 class="intro-heading">There's no wrong answer here.</h1>
+      <p class="intro-body">
+        Answer 6 questions, get 1,804+ Skills, Agents &amp; Commands for Claude Code.
+        Browse, preview, and stack production-ready components for your Claude Code
+        setup — one install command away. Normally $79.99. It's yours free for completing
+        this 90-second survey. Your answers help us tune <strong>Master The Claude</strong>
+        to what you actually need.
+      </p>
+      <div class="meta-row">
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          90 seconds
+        </span>
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          6 questions
+        </span>
+        <span class="meta-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          100% private
+        </span>
+      </div>
+      <div class="intro-cta">
+        <button class="btn btn-primary" onclick="startSurvey()">
+          Start — 90 seconds
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="screen" id="screen-q1">
+    <div class="card">
+      <div class="q-step">Question 1 of 6</div>
+      <h2 class="q-title">Which field best describes your work?</h2>
+      <div class="opt-list" id="q1-opts"></div>
+      <div class="btn-row solo">
+        <button class="btn btn-primary" id="q1-next" disabled onclick="goNext(1)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="screen" id="screen-q2">
+    <div class="card">
+      <div class="q-step">Question 2 of 6</div>
+      <h2 class="q-title">What's your main goal with Claude?</h2>
+      <div class="opt-list" id="q2-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(2)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q2-next" disabled onclick="goNext(2)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="screen" id="screen-q3">
+    <div class="card">
+      <div class="q-step">Question 3 of 6</div>
+      <h2 class="q-title">What do you spend the most time on at work?</h2>
+      <div class="opt-list" id="q3-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(3)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q3-next" disabled onclick="goNext(3)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="screen" id="screen-q4">
+    <div class="card">
+      <div class="q-step">Question 4 of 6</div>
+      <h2 class="q-title">What would make this plan a success?</h2>
+      <div class="opt-list" id="q4-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(4)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q4-next" disabled onclick="goNext(4)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="screen" id="screen-q5">
+    <div class="card">
+      <div class="q-step">Question 5 of 6</div>
+      <h2 class="q-title">What do you expect to get from Jobescape?</h2>
+      <div class="opt-list" id="q5-opts"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(5)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q5-next" disabled onclick="goNext(5)">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 — OPTIONAL FREE TEXT -->
+  <div class="screen" id="screen-q6">
+    <div class="card">
+      <div class="q-step">One last thing</div>
+      <h2 class="q-title">Anything else you'd like us to know?</h2>
+      <p class="q-sub">Optional — skip if nothing comes to mind.</p>
+      <textarea
+        class="free-textarea"
+        id="q6-input"
+        placeholder="Any suggestions, missing topics, or things that surprised you..."
+        oninput="answers[6] = this.value.trim()"
+      ></textarea>
+      <div class="submit-error" id="submit-error">
+        Something went wrong saving your response. Please check your connection and try again.
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(6)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </button>
+        <button class="btn btn-primary" id="q6-submit" onclick="submitSurvey()">
+          Submit &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THANK YOU SCREEN -->
+  <div class="screen" id="screen-thanks">
+    <div class="card" style="text-align:center">
+      <div class="ty-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="ty-heading">Thank you — that genuinely helps.</h2>
+      <p class="ty-sub">
+        We're reading every response. The next version of Master the Claude
+        will be built around answers like yours.
+      </p>
+      <div class="summary-grid" id="summary-grid" style="text-align:left"></div>
+      <div style="display:flex;justify-content:center">
+        <button class="btn-gift" onclick="openGiftModal()">Get your free library 🎁</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── GIFT MODAL ─────────────────────────────────── -->
+<div class="modal-overlay" id="gift-modal" onclick="handleOverlayClick(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeGiftModal()" aria-label="Close">×</button>
+    <lottie-player
+      src="gift.json"
+      background="transparent"
+      speed="1"
+      style="width:240px;height:240px;margin:0 auto 20px;display:block"
+      autoplay>
+    </lottie-player>
+    <h3 class="modal-heading">Done — here's your library.</h3>
+    <p class="modal-sub">Thanks for the answers. As promised, you now have full access to the Jobescape Templates library: 1,804+ Skills, Agents, Commands, and MCPs for Claude Code.</p>
+    <p class="modal-sub" style="font-size:13px;margin-top:-8px">Bookmark it. New components get added every month.</p>
+    <a href="https://templates.jobescape.me/" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;text-decoration:none">Open my library →</a>
+  </div>
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────────── -->
+<footer>jobescape.me &nbsp;·&nbsp; Your answers are private and used only to improve the course.</footer>
+
+<script>
+  // ══════════════════════════════════════════════════
+  //  PASTE YOUR SUPABASE CREDENTIALS HERE
+  // ══════════════════════════════════════════════════
+  const SUPABASE_URL = 'https://bzslzhddzmaqkryyypqi.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6c2x6aGRkem1hcWtyeXl5cHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDA1NTAsImV4cCI6MjA5NTUxNjU1MH0.T15wblcjr32hHHObMVZHnjkU1_-i4J1MwvbHZ0meEsw';
+  // ══════════════════════════════════════════════════
+
+  // ── QUESTION DATA ──────────────────────────────
+  const Q = {
+    1: {
+      short: 'Your field',
+      opts: [
+        ['💰', 'Finance / accounting / banking'],
+        ['⚖️', 'Legal / compliance'],
+        ['📣', 'Marketing / sales / growth'],
+        ['💻', 'Software / engineering / IT'],
+        ['📋', 'Operations / project management / consulting'],
+        ['🎨', 'Design / content / creative'],
+        ['🩺', 'Healthcare / pharma / biotech'],
+        ['🎓', 'Education / research'],
+        ['🛒', 'Retail / e-commerce / hospitality'],
+        ['🏗️', 'Real estate / construction / manufacturing'],
+        ['🏛️', 'Government / non-profit'],
+        ['••', 'None of these'],
+      ]
+    },
+    2: {
+      short: 'Main goal',
+      opts: [
+        ['⚡', 'Save time — do the same job faster'],
+        ['🏆', 'Better outputs — higher quality, fewer mistakes'],
+        ['📈', 'Get promoted or change roles — build AI skills'],
+        ['💸', 'Earn extra income — freelance or side projects'],
+        ['🚀', 'Build something — a product, app, or business'],
+        ['💡', 'Just learn — curious about what\'s possible'],
+        ['👥', 'Help my team or company adopt AI'],
+      ]
+    },
+    3: {
+      short: 'Most time on',
+      opts: [
+        ['✉️', 'Writing emails and messages'],
+        ['📄', 'Writing documents, reports, proposals'],
+        ['📊', 'Analyzing data, spreadsheets, financial work'],
+        ['🖥️', 'Making presentations and pitch decks'],
+        ['🔍', 'Research — finding and summarizing information'],
+        ['💼', 'Client work — proposals, contracts, deliverables'],
+        ['⌨️', 'Coding and technical work'],
+        ['📅', 'Planning, scheduling, project management'],
+        ['🎙️', 'Meetings, calls, follow-ups'],
+        ['✨', 'Creative work — content, design, marketing'],
+        ['🔄', 'Repetitive admin — data entry, status updates'],
+        ['••', 'Nothing specific — just want to use AI better'],
+      ]
+    },
+    4: {
+      short: 'Success looks like',
+      opts: [
+        ['✅', 'I shipped something real I actually used at work'],
+        ['🧠', 'I understand Claude deeply and know when to use it'],
+        ['⚡', 'I\'m noticeably faster — measurable time savings'],
+        ['💰', 'I made money — promotion, client, or extra income'],
+        ['🛠️', 'I built something — an app, automation, or product'],
+        ['🎖️', 'I have credentials — certificates or portfolio pieces'],
+        ['👥', 'I helped my team or company adopt Claude'],
+      ]
+    },
+    5: {
+      short: 'Expected from Jobescape',
+      opts: [
+        ['📚', 'Learn the fundamentals — understand Claude well'],
+        ['📋', 'Ready-to-use prompts I can copy and adapt'],
+        ['🔀', 'Ready-to-use workflows for tasks I do every week'],
+        ['🔌', 'Claude Skills I can install and run on demand'],
+        ['💻', 'Real tools I build during the plan and keep using'],
+        ['📐', 'Templates and frameworks for documents and emails'],
+        ['🔨', 'Hands-on practice with real-world examples'],
+        ['🗺️', 'A clear structured learning path'],
+        ['🪪', 'Career-focused skills for my resume or interviews'],
+        ['🎯', 'Help applying Claude to my specific field'],
+        ['💬', 'Community or mentor support'],
+        ['••', 'Something else'],
+      ]
+    }
+  };
+
+  // ── SESSION & EVENT TRACKING ───────────────────
+  const sessionId = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+  function trackEvent(event, metadata) {
+    fetch(`${SUPABASE_URL}/rest/v1/survey_events`, {
+      method: 'POST',
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify({ session_id: sessionId, event, metadata: metadata || '' })
+    }).catch(() => {});
+  }
+
+  // ── STATE ──────────────────────────────────────
+  const answers = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: '' };
+  let userEmail = '';
+  let current = 'intro';
+
+  // ── CUSTOMER.IO EMAIL FETCH (non-blocking) ──────
+  function fetchEmailFromCDP() {
+    const apiKey = '3f46f8cd6239ea73235b';
+    fetch('https://cdp.customer.io/v1/identify', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(apiKey + ':'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return;
+      userEmail = data.email
+        || (data.traits && data.traits.email)
+        || '';
+    })
+    .catch(() => {});
+  }
+
+  // ── BUILD OPTION LISTS ─────────────────────────
+  function buildOpts(n) {
+    const container = document.getElementById(`q${n}-opts`);
+    if (!container || container.children.length) return;
+    Q[n].opts.forEach(([emoji, text], i) => {
+      const el = document.createElement('div');
+      el.className = 'opt';
+      el.innerHTML = `
+        <span class="opt-emoji" aria-hidden="true">${emoji}</span>
+        <span class="opt-label">${text}</span>
+        <span class="opt-check">
+          <svg viewBox="0 0 12 12"><polyline points="1.5 6 4.5 9.5 10.5 2.5"/></svg>
+        </span>`;
+      el.addEventListener('click', () => pick(n, i, text));
+      if (answers[n] === text) el.classList.add('selected');
+      container.appendChild(el);
+    });
+    if (answers[n]) document.getElementById(`q${n}-next`).disabled = false;
+  }
+
+  function pick(n, idx, text) {
+    answers[n] = text;
+    document.querySelectorAll(`#q${n}-opts .opt`).forEach((el, i) =>
+      el.classList.toggle('selected', i === idx));
+    document.getElementById(`q${n}-next`).disabled = false;
+  }
+
+  // ── PROGRESS BAR ───────────────────────────────
+  const PROGRESS = {
+    q1: [1, 6, 'Question 1 of 6'],
+    q2: [2, 6, 'Question 2 of 6'],
+    q3: [3, 6, 'Question 3 of 6'],
+    q4: [4, 6, 'Question 4 of 6'],
+    q5: [5, 6, 'Question 5 of 6'],
+    q6: [6, 6, 'One last thing'],
+  };
+
+  function setProgress(screenId) {
+    const wrap = document.getElementById('progress-wrap');
+    const p = PROGRESS[screenId];
+    if (!p) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    const [step, total, label] = p;
+    const pct = Math.round((step / total) * 100);
+    document.getElementById('progress-label').textContent = label;
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  // ── SCREEN TRANSITIONS ─────────────────────────
+  function show(id) {
+    const el = document.getElementById(`screen-${id}`);
+    const m = id.match(/^q(\d)$/);
+    if (m) {
+      const n = +m[1];
+      if (Q[n]) buildOpts(n);
+      if (n === 6) document.getElementById('q6-input').value = answers[6] || '';
+    }
+    if (id === 'thanks') {
+      trackEvent('gift_seen');
+    }
+    setProgress(id);
+    el.classList.add('active');
+    current = id;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function go(fromId, toId) {
+    const from = document.getElementById(`screen-${fromId}`);
+    from.classList.remove('active');
+    from.classList.add('leaving');
+    setTimeout(() => {
+      from.classList.remove('leaving');
+      show(toId);
+    }, 200);
+  }
+
+  // ── NAVIGATION ─────────────────────────────────
+  function startSurvey() { trackEvent('intro_seen'); trackEvent('survey_started'); go('intro', 'q1'); }
+  function goNext(n)     { trackEvent('question_completed', `Q${n}`); go(`q${n}`, n < 6 ? `q${n + 1}` : 'thanks'); }
+  function goBack(n)     { go(`q${n}`, n > 1 ? `q${n - 1}` : 'intro'); }
+
+  // ── SUBMIT → SUPABASE ──────────────────────────
+  async function submitSurvey() {
+    const btn = document.getElementById('q6-submit');
+    const errorEl = document.getElementById('submit-error');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
+    errorEl.style.display = 'none';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/survey_responses`, {
+        method: 'POST',
+        headers: {
+          'apikey':        SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify({
+          email:       userEmail,
+          field:       answers[1],
+          goal:        answers[2],
+          time_drain:  answers[3],
+          success:     answers[4],
+          expectation: answers[5],
+          suggestions: answers[6] || ''
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      trackEvent('question_completed', 'Q6');
+      trackEvent('survey_submitted');
+      buildSummary();
+      go('q6', 'thanks');
+
+    } catch (err) {
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'Submit &rarr;';
+    }
+  }
+
+  // ── THANK YOU SUMMARY ──────────────────────────
+  function buildSummary() {
+    const grid = document.getElementById('summary-grid');
+    grid.innerHTML = '';
+    const items = [
+      { q: 'Your field',              a: answers[1] },
+      { q: 'Main goal',               a: answers[2] },
+      { q: 'Most time on',            a: answers[3] },
+      { q: 'Success looks like',      a: answers[4] },
+      { q: 'Expected from Jobescape', a: answers[5] },
+      ...(answers[6] ? [{ q: 'Suggestions',            a: answers[6] }] : []),
+    ];
+    items.forEach(({ q, a }, i) => {
+      const c = document.createElement('div');
+      c.className = 'sum-card';
+      c.style.animationDelay = `${(i + 1) * 0.07}s`;
+      c.innerHTML = `<div class="sum-q">${q}</div><div class="sum-a">${a || '—'}</div>`;
+      grid.appendChild(c);
+    });
+  }
+
+  // ── GIFT MODAL ─────────────────────────────────
+  function openGiftModal() {
+    document.getElementById('gift-modal').classList.add('open');
+    const player = document.querySelector('#gift-modal lottie-player');
+    if (player) { player.seek(0); player.play(); }
+  }
+
+  function closeGiftModal() {
+    document.getElementById('gift-modal').classList.remove('open');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('gift-modal')) closeGiftModal();
+  }
+
+  // ── INIT ───────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    trackEvent('page_viewed');
+    trackEvent('intro_seen');
+    fetchEmailFromCDP();
+    [1, 2, 3, 4, 5].forEach(buildOpts);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeGiftModal();
+    });
+  });
+</script>
+</body>
+</html>
